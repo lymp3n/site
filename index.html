@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dorksense</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
+</head>
+<body class="bg-[#f5f5f5] text-gray-900 overflow-x-hidden">
+    <!-- Прелоадер -->
+    <div id="preloader" class="fixed inset-0 bg-gray-900 z-[9999] flex items-center justify-center">
+        <div class="text-center">
+            <div class="loading-spinner-large mb-4"></div>
+            <div class="text-white text-xl font-bold"><span class="text-gray-300">DORK</span><span class="text-[#FF4D80]">SENSE</span></div>
+            <div class="text-gray-400 mt-2">Загрузка творческого хаоса...</div>
+        </div>
+    </div>
+
+    <!-- Прогресс бар -->
+    <div class="progress-bar"></div>
+    
+    <!-- Кастомный курсор -->
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="fixed top-4 right-4 bg-[#FF4D80] text-white p-4 rounded-lg shadow-lg z-[1000] transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center">
+            <div class="w-3 h-3 bg-white rounded-full mr-2"></div>
+            <span id="notification-text"></span>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="fixed w-full z-50 bg-gray-100/95 backdrop-blur-sm border-b-2 border-gray-300 dark:bg-gray-900/95 dark:border-gray-700">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-black glitch text-gray-900 dark:text-white" data-text="DORKSENSE"><span class="text-gray-900 dark:text-white">DORK</span><span class="text-[#FF4D80]">SENSE</span></a>
+            <div class="hidden md:flex space-x-8 font-medium text-gray-700 dark:text-gray-300">
+                <a href="#work" class="hover:text-[#FF4D80] transition-all duration-300 transform hover:scale-110">Работы</a>
+                <a href="#about" class="hover:text-[#00A3FF] transition-all duration-300 transform hover:scale-110">Обо мне</a>
+                <a href="#avatar" class="hover:text-[#8A2BE2] transition-all duration-300 transform hover:scale-110">Аватар</a>
+                <a href="#3d" class="hover:text-[#FFB800] transition-all duration-300 transform hover:scale-110">3D Модель</a>
+                <a href="#skills" class="hover:text-[#00A3FF] transition-all duration-300 transform hover:scale-110">Навыки</a>
+                <a href="#contact" class="hover:text-[#FF4D80] transition-all duration-300 transform hover:scale-110">Контакты</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Переключатель темы -->
+                <button id="theme-toggle" class="p-2 rounded-full bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800 transition-colors">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                    </svg>
+                    <svg class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+                <button class="md:hidden text-2xl text-gray-900 dark:text-white" id="mobile-menu-button">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Мобильное меню -->
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-gray-900 text-white flex flex-col items-center justify-center hidden">
+        <button id="close-menu" class="absolute top-6 right-6 text-3xl">✕</button>
+        <div class="flex flex-col space-y-8 text-2xl font-bold text-center">
+            <a href="#work" class="hover:text-[#FF4D80] transition-colors">Работы</a>
+            <a href="#about" class="hover:text-[#00A3FF] transition-colors">Обо мне</a>
+            <a href="#avatar" class="hover:text-[#8A2BE2] transition-colors">Аватар</a>
+            <a href="#3d" class="hover:text-[#FFB800] transition-colors">3D Модель</a>
+            <a href="#skills" class="hover:text-[#00A3FF] transition-colors">Навыки</a>
+            <a href="#contact" class="hover:text-[#FF4D80] transition-colors">Контакты</a>
+        </div>
+    </div>
+
+    <!-- Герой секция -->
+    <section class="min-h-screen flex items-center justify-center px-6 pt-20 pb-10 bg-gradient-to-br from-[#8A2BE2] to-[#FF4D80] relative overflow-hidden">
+        <!-- Анимированный бэкграунд -->
+        <div id="particles-container" class="absolute inset-0"></div>
+        
+        <div class="container mx-auto text-center relative z-10">
+            <h1 class="text-6xl md:text-9xl font-black mb-6 text-white glitch leading-none" data-text="DORKSENSE"><span class="text-gray-100">DORK</span><span class="text-[#00A3FF]">SENSE</span></h1>
+            <div class="typing-container">
+                <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto font-medium text-white typing-animation">Визуальный взрыв на стыке дизайна, анимации и цифрового хаоса. Создаю интерфейсы, которые невозможно забыть.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#work" class="bg-gray-900 text-white px-8 py-4 text-lg font-bold hover:bg-[#FF4D80] transition-all duration-300 transform hover:-translate-y-1 border-2 border-gray-900 floating cursor-none">Смотреть работы</a>
+                <a href="#contact" class="bg-transparent text-white px-8 py-4 text-lg font-bold border-2 border-white hover:bg-white hover:text-gray-900 transition-all duration-300 cursor-none">Связаться</a>
+            </div>
+        </div>
+        
+        <!-- Анимированные элементы -->
+        <div class="absolute top-1/4 left-10 w-20 h-20 bg-[#FF4D80] rounded-full opacity-70 floating pulse-slow"></div>
+        <div class="absolute top-1/3 right-20 w-16 h-16 bg-[#00A3FF] rounded-full opacity-70 floating" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-1/4 left-1/4 w-24 h-24 bg-[#FFB800] rounded-full opacity-70 floating" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-1/3 right-1/4 w-12 h-12 bg-[#8A2BE2] rounded-full opacity-70 floating" style="animation-delay: 3s;"></div>
+    </section>
+
+    <!-- Секция с работами -->
+    <section id="work" class="py-20 px-6 bg-[#8A2BE2] relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="container mx-auto relative z-10">
+            <h2 class="text-4xl md:text-6xl font-black mb-12 text-white text-center">Избранные <span class="text-[#00A3FF]">работы</span></h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Проект 1 -->
+                <div class="project-card bg-[#00A3FF] border-2 border-gray-900 p-6 transform transition-all duration-500 hover:-rotate-2 hover:shadow-[8px_8px_0px_0px_#000] group overflow-hidden relative cursor-none">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-[#FF4D80] to-[#8A2BE2] opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur"></div>
+                    <div class="relative bg-[#00A3FF] h-full">
+                        <div class="h-64 md:h-80 bg-gradient-to-br from-[#FF4D80] to-[#8A2BE2] border-2 border-gray-900 mb-4 flex items-center justify-center overflow-hidden">
+                            <span class="text-4xl font-black text-white">ПРОЕКТ "ХАОС"</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Интерактивный цифровой опыт</h3>
+                        <p class="mb-4">Исследование границ веб-анимации и пользовательского взаимодействия через призму необрутализма.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">GSAP</span>
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">Tailwind</span>
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">Three.js</span>
+                        </div>
+                        <button class="project-details-btn mt-4 bg-gray-900 text-white px-4 py-2 text-sm font-bold hover:bg-[#FF4D80] transition-all duration-300 w-full">Подробнее</button>
+                    </div>
+                </div>
+
+                <!-- Проект 2 -->
+                <div class="project-card bg-[#FFB800] border-2 border-gray-900 p-6 transform transition-all duration-500 hover:rotate-2 hover:shadow-[8px_8px_0px_0px_#000] group overflow-hidden relative cursor-none">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-[#00A3FF] to-[#FF4D80] opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur"></div>
+                    <div class="relative bg-[#FFB800] h-full">
+                        <div class="h-64 md:h-80 bg-gradient-to-br from-[#8A2BE2] to-[#00A3FF] border-2 border-gray-900 mb-4 flex items-center justify-center overflow-hidden">
+                            <span class="text-4xl font-black text-white">BRUTAL BOLD</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Экспериментальный брендинг</h3>
+                        <p class="mb-4">Система визуальной идентификации, бросающая вызов традиционным представлениям о красоте в дизайне.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">Брендинг</span>
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">Анимация</span>
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">Необрутализм</span>
+                        </div>
+                        <button class="project-details-btn mt-4 bg-gray-900 text-white px-4 py-2 text-sm font-bold hover:bg-[#FF4D80] transition-all duration-300 w-full">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Обо мне -->
+    <section id="about" class="py-20 px-6 bg-[#00A3FF] relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black/10 to-transparent"></div>
+        <div class="container mx-auto max-w-4xl relative z-10">
+            <h2 class="text-4xl md:text-6xl font-black mb-12 text-white text-center">Дизайнер, который не играет по <span class="text-[#8A2BE2]">правилам</span></h2>
+            
+            <div class="bg-[#FF4D80] border-2 border-gray-900 p-8 md:p-12 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                <p class="text-xl mb-6 text-white">Я создаю цифровые продукты, которые бросают вызов традиционным представлениям о веб-дизайне. Моя философия — эстетика контролируемого хаоса, где несовершенство становится преимуществом, а яркие цвета и смелые типографические решения создают незабываемый пользовательский опыт.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                    <div class="bg-gray-900 text-white p-4 text-center border-2 border-gray-900 transform hover:-translate-y-2 transition-transform duration-300">
+                        <span class="block text-2xl font-black">47%</span>
+                        <span class="text-sm">Больше вовлеченности</span>
+                    </div>
+                    <div class="bg-[#FFB800] text-gray-900 p-4 text-center border-2 border-gray-900 transform hover:-translate-y-2 transition-transform duration-300">
+                        <span class="block text-2xl font-black">3.8с</span>
+                        <span class="text-sm">Среднее время на сайте</span>
+                    </div>
+                    <div class="bg-white text-gray-900 p-4 text-center border-2 border-gray-900 transform hover:-translate-y-2 transition-transform duration-300">
+                        <span class="block text-2xl font-black">28</span>
+                        <span class="text-sm">Проектов завершено</span>
+                    </div>
+                    <div class="bg-[#8A2BE2] text-white p-4 text-center border-2 border-gray-900 transform hover:-translate-y-2 transition-transform duration-300">
+                        <span class="block text-2xl font-black">100%</span>
+                        <span class="text-sm">Безумия в каждом пикселе</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция с аватаром -->
+    <section id="avatar" class="py-20 px-6 bg-[#FFB800]">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl md:text-6xl font-black mb-12 text-gray-900 text-center">Творческий <span class="text-[#FF4D80]">ум</span> за работой</h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="relative border-2 border-gray-900 bg-white p-4 transform rotate-2 hover:rotate-0 transition-transform duration-500 image-parallax-container">
+                        <img src="./templates/avatar.jpg" 
+                             alt="Дизайнер dorksense" 
+                             class="w-full max-w-md h-auto image-hover-effect border-2 border-gray-900 image-parallax"
+                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDUwMCA1MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjRjBGMEYwIi8+CjxjaXJjbGUgY3g9IjI1MCIgY3k9IjIwMCIgcj0iODAiIGZpbGw9IiNGRjREODAiLz4KPHJlY3QgeD0iMTUwIiB5PSIzMDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIiByeD0iMjAiIGZpbGw9IiNGRjREODAiLz4KPHN2Zz4K'">
+                        <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-[#FF4D80] border-2 border-gray-900"></div>
+                        <div class="absolute -top-4 -left-4 w-16 h-16 bg-[#00A3FF] border-2 border-gray-900"></div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <div class="bg-gray-900 text-white p-6 border-2 border-[#8A2BE2] transform -rotate-1">
+                        <h3 class="text-2xl font-bold mb-4 text-[#FFB800]">О создателе</h3>
+                        <p class="mb-4">Меня зовут Алекс, и я создаю цифровые миры на стыке дизайна и технологий. Моя страсть — превращать сложные идеи в интуитивные и визуально впечатляющие интерфейсы.</p>
+                        <p class="mb-4">С более чем 7-летним опытом в цифровом дизайне, я специализируюсь на создании уникальных пользовательских интерфейсов, которые не только функциональны, но и эмоциональны.</p>
+                        <div class="flex flex-wrap gap-2 mt-6">
+                            <span class="bg-[#FF4D80] text-white px-3 py-1 text-sm font-bold">UI/UX Дизайн</span>
+                            <span class="bg-[#00A3FF] text-white px-3 py-1 text-sm font-bold">3D Визуализация</span>
+                            <span class="bg-[#8A2BE2] text-white px-3 py-1 text-sm font-bold">Брендинг</span>
+                            <span class="bg-[#FFB800] text-gray-900 px-3 py-1 text-sm font-bold">Анимация</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция с 3D моделью -->
+    <section id="3d" class="py-20 px-6 bg-[#8A2BE2] relative overflow-hidden">
+        <div class="container mx-auto relative z-10">
+            <h2 class="text-4xl md:text-6xl font-black mb-12 text-white text-center">Интерактивная <span class="text-[#00A3FF]">3D Модель</span></h2>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="w-full lg:w-1/2">
+                    <div class="bg-[#FFB800] border-2 border-gray-900 p-6 h-full">
+                        <h3 class="text-2xl font-bold mb-4 text-gray-900">Эксперименты в трехмерном пространстве</h3>
+                        <p class="mb-4 text-gray-900">Я интегрирую 3D-графику в веб-дизайн, создавая иммерсивные и интерактивные пользовательские интерфейсы. Использование Three.js позволяет мне создавать сложные визуальные композиции, которые оживают прямо в браузере.</p>
+                        <p class="mb-4 text-gray-900">Мой подход к 3D-дизайну включает:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-2 text-gray-900">
+                            <li>Создание интерактивных 3D-интерфейсов</li>
+                            <li>Разработка анимированных переходов и взаимодействий</li>
+                            <li>Интеграция 3D-элементов в традиционные веб-сайты</li>
+                            <li>Оптимизация производительности для плавного пользовательского опыта</li>
+                        </ul>
+                        <div class="flex flex-wrap gap-2 mt-6">
+                            <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">Three.js</span>
+                            <span class="bg-[#FF4D80] text-white px-3 py-1 text-sm font-bold">Blender</span>
+                            <span class="bg-[#00A3FF] text-white px-3 py-1 text-sm font-bold">WebGL</span>
+                            <span class="bg-[#8A2BE2] text-white px-3 py-1 text-sm font-bold">GLSL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="w-full lg:w-1/2">
+                    <div class="bg-gradient-to-br from-[#f8fafc] to-[#e2e8f0] border-2 border-[#00A3FF] h-96 md:h-[500px] relative overflow-hidden">
+                        <div id="3d-container" class="w-full h-full"></div>
+                        <div class="loading-overlay" id="loading-overlay">
+                            <div class="loading-content">
+                                <div class="loading-spinner"></div>
+                                <div class="loading-text" id="loading-text">Загрузка 3D модели...</div>
+                                <div class="loading-progress" id="loading-progress">
+                                    <div class="progress-bar-inner" id="progress-bar-inner"></div>
+                                </div>
+                                <div class="loading-details" id="loading-details"></div>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-4 left-4 text-gray-900 bg-white/70 px-3 py-1 text-sm">
+                            Перетащите для вращения • Скролл для масштабирования
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция с навыками -->
+    <section id="skills" class="py-20 px-6 bg-[#00A3FF]">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl md:text-6xl font-black mb-12 text-white text-center">Мои <span class="text-[#8A2BE2]">навыки</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-[#FF4D80] border-2 border-gray-900 p-6 transform -rotate-1">
+                    <h3 class="text-2xl font-bold mb-4 text-white">Технические навыки</h3>
+                    <div class="space-y-4">
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1 text-white">
+                                <span class="font-bold">UI/UX Дизайн</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="95"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1 text-white">
+                                <span class="font-bold">3D Моделирование</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1 text-white">
+                                <span class="font-bold">Веб-анимация</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-1 text-white">
+                                <span class="font-bold">Frontend Разработка</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="80"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-[#FFB800] border-2 border-gray-900 p-6 transform rotate-1">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Инструменты</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white border-2 border-gray-900 p-3 text-center hover:bg-gray-900 hover:text-white transition-colors">
+                            <span class="font-bold">Figma</span>
+                        </div>
+                        <div class="bg-white border-2 border-gray-900 p-3 text-center hover:bg-gray-900 hover:text-white transition-colors">
+                            <span class="font-bold">Blender</span>
+                        </div>
+                        <div class="bg-white border-2 border-gray-900 p-3 text-center hover:bg-gray-900 hover:text-white transition-colors">
+                            <span class="font-bold">Three.js</span>
+                        </div>
+                        <div class="bg-white border-2 border-gray-900 p-3 text-center hover:bg-gray-900 hover:text-white transition-colors">
+                            <span class="font-bold">GSAP</span>
+                        </div>
+                        <div class="bg-white border-2 border-gray-900 p-3 text-center hover:bg-gray-900 hover:text-white transition-colors">
+                            <span class="font-bold">After Effects</span>
+                        </div>
+                        <div class="bg-white border-2 border-gray-900 p-3 text-center hover:bg-gray-900 hover:text-white transition-colors">
+                            <span class="font-bold">Illustrator</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="py-20 px-6 bg-gray-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-[#FF4D80] rounded-full"></div>
+            <div class="absolute top-40 right-20 w-24 h-24 bg-[#00A3FF] rounded-full"></div>
+            <div class="absolute bottom-20 left-1/4 w-28 h-28 bg-[#FFB800] rounded-full"></div>
+            <div class="absolute bottom-40 right-1/3 w-20 h-20 bg-[#8A2BE2] rounded-full"></div>
+        </div>
+        
+        <div class="container mx-auto max-w-2xl text-center relative z-10">
+            <h2 class="text-4xl md:text-6xl font-black mb-6">Давайте создадим <span class="text-[#FF4D80]">хаос</span> вместе</h2>
+            <p class="text-xl mb-8 text-gray-300">Готовы к проекту, который взорвет интернет? Свяжитесь со мной, и мы создадим что-то по-настоящему невероятное.</p>
+            
+            <div class="bg-white text-gray-900 p-8 border-2 border-[#FF4D80] transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                <form id="contact-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Имя" class="p-3 border-2 border-gray-300 focus:outline-none focus:border-[#FF4D80] transition-colors" required>
+                        <input type="email" placeholder="Email" class="p-3 border-2 border-gray-300 focus:outline-none focus:border-[#00A3FF] transition-colors" required>
+                    </div>
+                    <input type="text" placeholder="Тема" class="w-full p-3 border-2 border-gray-300 focus:outline-none focus:border-[#8A2BE2] transition-colors" required>
+                    <textarea placeholder="Сообщение" rows="4" class="w-full p-3 border-2 border-gray-300 focus:outline-none focus:border-[#FFB800] transition-colors" required></textarea>
+                    <button type="submit" class="w-full bg-[#FF4D80] text-white p-3 font-bold border-2 border-gray-900 hover:bg-gray-900 hover:text-[#FF4D80] transition-all duration-300">Отправить сообщение</button>
+                </form>
+                
+                <div class="mt-8 pt-8 border-t-2 border-gray-300">
+                    <div class="text-2xl font-black mb-2">dork@sense.design</div>
+                    <div class="text-lg mb-6 text-gray-700">Или найдите меня в цифровой пустоши</div>
+                    
+                    <div class="flex justify-center space-x-6">
+                        <a href="#" class="bg-[#FF4D80] text-white p-3 border-2 border-gray-900 hover:bg-white hover:text-[#FF4D80] transition-all duration-300 transform hover:scale-110 hover:-rotate-12 cursor-none">IG</a>
+                        <a href="#" class="bg-[#00A3FF] text-white p-3 border-2 border-gray-900 hover:bg-gray-900 hover:text-[#00A3FF] transition-all duration-300 transform hover:scale-110 cursor-none">BH</a>
+                        <a href="#" class="bg-[#8A2BE2] text-white p-3 border-2 border-gray-900 hover:bg-white hover:text-[#8A2BE2] transition-all duration-300 transform hover:scale-110 hover:rotate-12 cursor-none">TT</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="bg-[#8A2BE2] text-white py-8 px-6 text-center">
+        <div class="container mx-auto">
+            <div class="text-2xl font-black mb-4"><span class="text-white">DORK</span><span class="text-[#FF4D80]">SENSE</span></div>
+            <p class="text-gray-300">© 2025 Все права не защищены. Копируйте. Воруйте. Создавайте хаос.</p>
+        </div>
+    </footer>
+
+    <!-- Модальное окно для проектов -->
+    <div id="project-modal" class="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 hidden">
+        <div class="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-gray-900 relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-2xl z-10">✕</button>
+            <div id="modal-content" class="p-6">
+                <!-- Контент модального окна будет добавляться динамически -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
