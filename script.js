@@ -5,6 +5,9 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 let scene, camera, renderer, controls, model;
 let modelLoaded = false;
 let isDarkTheme = false;
+let cursorEnabled = true;
+let mouseX = 0;
+let mouseY = 0;
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
@@ -36,32 +39,77 @@ function initPreloader() {
     const preloader = document.getElementById('preloader');
 }
 
-// Ускоренный кастомный курсор
+// Переработанная система кастомного курсора
 function initCustomCursor() {
     const cursor = document.getElementById('cursor');
     const cursorFollower = document.getElementById('cursor-follower');
     
-    document.addEventListener('mousemove', function(e) {
-        // Основной курсор
-        gsap.to(cursor, {
-            x: e.clientX - 10,
-            y: e.clientY - 10,
-            duration: 0.05
-        });
-        
-        // Следующий за курсором элемент с задержкой
-        gsap.to(cursorFollower, {
-            x: e.clientX - 20,
-            y: e.clientY - 20,
-            duration: 0.1
-        });
+    // Проверяем, не мобильное ли устройство
+    if (window.innerWidth <= 768) {
+        cursorEnabled = false;
+        cursor.style.display = 'none';
+        cursorFollower.style.display = 'none';
+        document.body.style.cursor = 'auto';
+        return;
+    }
+    
+    // Инициализируем позицию курсора по центру экрана
+    mouseX = window.innerWidth / 2;
+    mouseY = window.innerHeight / 2;
+    
+    // Инициализируем позицию курсора
+    gsap.set(cursor, { 
+        x: mouseX - 10, 
+        y: mouseY - 10,
+        opacity: 1
+    });
+    gsap.set(cursorFollower, { 
+        x: mouseX - 20, 
+        y: mouseY - 20,
+        opacity: 1
     });
     
+    // Основной обработчик движения мыши
+    const onMouseMove = (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        // Основной курсор (мгновенно)
+        gsap.set(cursor, {
+            x: mouseX - 10,
+            y: mouseY - 10
+        });
+    };
+    
+    // Плавное следование для второго курсора
+    let followerX = mouseX;
+    let followerY = mouseY;
+    
+    const animateFollower = () => {
+        const dx = mouseX - followerX;
+        const dy = mouseY - followerY;
+        
+        followerX += dx * 0.1;
+        followerY += dy * 0.1;
+        
+        gsap.set(cursorFollower, {
+            x: followerX - 20,
+            y: followerY - 20
+        });
+        
+        requestAnimationFrame(animateFollower);
+    };
+    
+    document.addEventListener('mousemove', onMouseMove);
+    animateFollower();
+    
     // Эффекты при наведении на интерактивные элементы
-    const interactiveElements = document.querySelectorAll('a, button, .project-card, .project-details-btn');
+    const interactiveElements = document.querySelectorAll('a, button, .project-card, .project-details-btn, input, textarea');
     
     interactiveElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
+            if (!cursorEnabled) return;
+            
             cursor.style.transform = 'scale(1.5)';
             cursor.style.background = '#8A2BE2';
             cursorFollower.style.transform = 'scale(1.2)';
@@ -69,11 +117,43 @@ function initCustomCursor() {
         });
         
         el.addEventListener('mouseleave', () => {
+            if (!cursorEnabled) return;
+            
             cursor.style.transform = 'scale(1)';
             cursor.style.background = '#FF4D80';
             cursorFollower.style.transform = 'scale(1)';
             cursorFollower.style.borderColor = '#00A3FF';
         });
+    });
+    
+    // Предотвращаем скрытие курсора при открытии модальных окон
+    document.addEventListener('click', (e) => {
+        if (!cursorEnabled) return;
+        
+        // Сохраняем позицию курсора при любом клике
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        // Мгновенное обновление позиции
+        gsap.set(cursor, {
+            x: mouseX - 10,
+            y: mouseY - 10
+        });
+    });
+    
+    // Обработка изменения размера окна
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+            cursorEnabled = false;
+            cursor.style.display = 'none';
+            cursorFollower.style.display = 'none';
+            document.body.style.cursor = 'auto';
+        } else {
+            cursorEnabled = true;
+            cursor.style.display = 'block';
+            cursorFollower.style.display = 'block';
+            document.body.style.cursor = 'none';
+        }
     });
 }
 
@@ -649,25 +729,25 @@ function initProjectModals() {
             const project = projectData[index];
             
             modalContent.innerHTML = `
-                <h3 class="text-3xl font-black mb-4 text-gray-900">${project.title}</h3>
-                <p class="mb-6 text-gray-700">${project.description}</p>
+                <h3 class="text-3xl font-black mb-4 text-gray-900 dark:text-white">${project.title}</h3>
+                <p class="mb-6 text-gray-700 dark:text-gray-300">${project.description}</p>
                 
                 <div class="mb-6">
-                    <h4 class="text-xl font-bold mb-2 text-gray-900">Особенности:</h4>
-                    <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Особенности:</h4>
+                    <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
                         ${project.details.map(detail => `<li>${detail}</li>`).join('')}
                     </ul>
                 </div>
                 
                 <div class="mb-6">
-                    <h4 class="text-xl font-bold mb-2 text-gray-900">Технологии:</h4>
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Технологии:</h4>
                     <div class="flex flex-wrap gap-2">
-                        ${project.technologies.map(tech => `<span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold">${tech}</span>`).join('')}
+                        ${project.technologies.map(tech => `<span class="bg-gray-900 dark:bg-gray-700 text-white px-3 py-1 text-sm font-bold">${tech}</span>`).join('')}
                     </div>
                 </div>
                 
-                <div class="bg-gray-100 p-4 border-2 border-gray-300">
-                    <p class="text-sm italic text-gray-700">"Этот проект стал вызовом традиционным представлениям о веб-дизайне и открыл новые горизонты в создании цифровых интерфейсов."</p>
+                <div class="bg-gray-100 dark:bg-gray-800 p-4 border-2 border-gray-300 dark:border-gray-600">
+                    <p class="text-sm italic text-gray-700 dark:text-gray-300">"Этот проект стал вызовом традиционным представлениям о веб-дизайне и открыл новые горизонты в создании цифровых интерфейсов."</p>
                 </div>
             `;
             
