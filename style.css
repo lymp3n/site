@@ -1,0 +1,415 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+:root {
+    --cursor-x: 0px;
+    --cursor-y: 0px;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+    cursor: none;
+}
+
+/* Добавьте этот стиль чтобы курсор всегда был поверх всех элементов */
+.custom-cursor,
+.cursor-follower {
+    z-index: 99999 !important; /* Увеличиваем z-index */
+}
+
+/* Убедитесь, что модальные окна не блокируют события мыши */
+#project-modal,
+#mobile-menu {
+    pointer-events: none;
+}
+
+#project-modal > *,
+#mobile-menu > * {
+    pointer-events: auto;
+}
+
+/* Темная тема */
+.dark {
+    --bg-color: #0f0f0f;
+    --text-color: #f5f5f5;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.dark .bg-\[\#f5f5f5\] {
+    background-color: #0f0f0f;
+}
+
+.dark .text-gray-900 {
+    color: #f5f5f5;
+}
+
+.dark .text-gray-901 {
+    color: #0f0f0f;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+    padding-left: 10px;
+}
+.dark .text-gray-90 {
+    color: #0f0f0f;
+}
+
+.dark .bg-white {
+    background-color: #1a1a1a;
+}
+
+.dark .border-gray-300 {
+    border-color: #374151;
+}
+
+.dark .text-gray-700 {
+    color: #989899;
+}
+
+.text-outline {
+    color: black;
+    -webkit-text-fill-color: #f5f5f5;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+}
+
+.dark .text-outline {
+    -webkit-text-fill-color: #0f0f0f;
+    -webkit-text-stroke-color: #f5f5f5;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accordion-open .accordion-content {
+    max-height: 500px;
+}
+
+.floating {
+    animation: floating 6s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0% { transform: translate(0, 0px); }
+    50% { transform: translate(0, -15px); }
+    100% { transform: translate(0, 0px); }
+}
+
+.pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.glitch {
+    position: relative;
+}
+
+.glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 #FF4D80;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: -2px 0 #00A3FF;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% { clip: rect(42px, 9999px, 44px, 0); }
+    5% { clip: rect(12px, 9999px, 59px, 0); }
+    10% { clip: rect(48px, 9999px, 29px, 0); }
+    15% { clip: rect(42px, 9999px, 73px, 0); }
+    20% { clip: rect(63px, 9999px, 27px, 0); }
+    25% { clip: rect(34px, 9999px, 55px, 0); }
+    30% { clip: rect(86px, 9999px, 73px, 0); }
+    35% { clip: rect(20px, 9999px, 20px, 0); }
+    40% { clip: rect(26px, 9999px, 60px, 0); }
+    45% { clip: rect(25px, 9999px, 66px, 0); }
+    50% { clip: rect(57px, 9999px, 98px, 0); }
+    55% { clip: rect(5px, 9999px, 46px, 0); }
+    60% { clip: rect(82px, 9999px, 31px, 0); }
+    65% { clip: rect(54px, 9999px, 27px, 0); }
+    70% { clip: rect(28px, 9999px, 99px, 0); }
+    75% { clip: rect(45px, 9999px, 69px, 0); }
+    80% { clip: rect(23px, 9999px, 85px, 0); }
+    85% { clip: rect(54px, 9999px, 84px, 0); }
+    90% { clip: rect(45px, 9999px, 47px, 0); }
+    95% { clip: rect(37px, 9999px, 20px, 0); }
+    100% { clip: rect(4px, 9999px, 91px, 0); }
+}
+
+@keyframes glitch-anim2 {
+    0% { clip: rect(65px, 9999px, 100px, 0); }
+    5% { clip: rect(52px, 9999px, 74px, 0); }
+    10% { clip: rect(79px, 9999px, 85px, 0); }
+    15% { clip: rect(75px, 9999px, 5px, 0); }
+    20% { clip: rect(67px, 9999px, 61px, 0); }
+    25% { clip: rect(14px, 9999px, 79px, 0); }
+    30% { clip: rect(1px, 9999px, 66px, 0); }
+    35% { clip: rect(86px, 9999px, 30px, 0); }
+    40% { clip: rect(23px, 9999px, 98px, 0); }
+    45% { clip: rect(85px, 9999px, 72px, 0); }
+    50% { clip: rect(71px, 9999px, 75px, 0); }
+    55% { clip: rect(2px, 9999px, 48px, 0); }
+    60% { clip: rect(30px, 9999px, 16px, 0); }
+    65% { clip: rect(59px, 9999px, 50px, 0); }
+    70% { clip: rect(41px, 9999px, 62px, 0); }
+    75% { clip: rect(2px, 9999px, 82px, 0); }
+    80% { clip: rect(47px, 9999px, 73px, 0); }
+    85% { clip: rect(3px, 9999px, 27px, 0); }
+    90% { clip: rect(26px, 9999px, 55px, 0); }
+    95% { clip: rect(42px, 9999px, 97px, 0); }
+    100% { clip: rect(38px, 9999px, 49px, 0); }
+}
+
+.typing-container {
+    display: inline-block;
+}
+
+.typing-animation {
+    overflow: hidden;
+    border-right: 3px solid #FF4D80;
+    white-space: nowrap;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #FF4D80; }
+}
+
+.image-hover-effect {
+    transition: all 0.5s ease;
+    filter: grayscale(100%);
+}
+
+.image-hover-effect:hover {
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+.progress-bar {
+    height: 4px;
+    background: #FF4D80;
+    width: 0%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+/* Ускоренный кастомный курсор */
+.custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: #FF4D80;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.05s ease;
+}
+
+.cursor-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #00A3FF;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    mix-blend-mode: difference;
+    transition: transform 0.1s ease, border-color 0.2s ease;
+}
+
+/* Эффекты курсора при наведении */
+a:hover ~ .custom-cursor,
+button:hover ~ .custom-cursor,
+.project-card:hover ~ .custom-cursor {
+    transform: scale(1.5);
+    background: #8A2BE2;
+}
+
+a:hover ~ .cursor-follower,
+button:hover ~ .cursor-follower,
+.project-card:hover ~ .cursor-follower {
+    transform: scale(1.2);
+    border-color: #FFB800;
+}
+
+/* Стили для загрузки 3D модели */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid #00A3FF;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+.loading-spinner-large {
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 6px solid #FF4D80;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.loading-progress {
+    width: 200px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    margin: 0 auto 10px;
+    overflow: hidden;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    background: #FF4D80;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.loading-details {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Стили для навыков */
+.skill-bar {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.skill-progress {
+    height: 100%;
+    background: #00A3FF;
+    width: 0%;
+    transition: width 1.5s ease-in-out;
+    border-radius: 5px;
+}
+
+/* Параллакс эффект для изображений */
+.image-parallax-container {
+    overflow: hidden;
+}
+
+.image-parallax {
+    transition: transform 0.3s ease-out;
+}
+
+/* Анимации для появления элементов */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Улучшенная контрастность для текста в светлой теме */
+nav a {
+    color: #ffffff;
+}
+
+.dark nav a {
+    color: #d1d5db;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .text-outline {
+        -webkit-text-stroke-width: 1px;
+    }
+    
+    .custom-cursor,
+    .cursor-follower {
+        display: none;
+    }
+    
+    body {
+        cursor: auto;
+    }
+}
+
+/* Оптимизация анимаций */
+.optimized-animation {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
+
+/* Плавные переходы для всех интерактивных элементов */
+a, button, .project-card, input, textarea {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
